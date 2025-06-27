@@ -34,7 +34,7 @@ const passwordCriteria: PasswordCriteria[] = [
 ];
 
 const getPasswordStrength = (password: string): { strength: number; label: string; color: string } => {
-  if (!password) return { strength: 0, label: "Enter password", color: "gray.400" };
+  if (!password) return { strength: 0, label: "", color: "gray.400" };
   
   const passedCriteria = passwordCriteria.filter(criteria => criteria.test(password)).length;
   
@@ -60,9 +60,11 @@ export const PasswordStrengthMeter = ({ password }: PasswordStrengthMeterProps) 
       </HStack>
       
       <Progress.Root
+      variant="outline"
         value={strength}
         size="sm"
-        colorScheme={
+        colorPalette={
+          strength == 0 ? "white":
           strength < 40 ? "red" : 
           strength < 60 ? "orange" : 
           strength < 80 ? "yellow" : 
