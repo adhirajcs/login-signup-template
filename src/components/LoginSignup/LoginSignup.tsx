@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { Flex, Box, Input, Button, Text, Fieldset, Field, Stack } from "@chakra-ui/react";
 import { PasswordInput } from "@/components/ui/password-input";
+import { PasswordStrengthMeter } from "@/components/LoginSignup/password-strength-meter";
 import { DarkMode, LightMode } from "@/components/ui/color-mode";
+import { handleSignUp } from "./handleSignUp";
+import { handleLogin } from "./handleLogin";
 
 const LoginSignup = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -39,116 +42,25 @@ const LoginSignup = () => {
     });
   }, [name, email, password, confirmPassword]);
 
-  const handleSignUp = () => {
-    let hasError = false;
-    const newErrors = {
-      name: false,
-      email: false,
-      password: false,
-      confirmPassword: false,
-    };
-
-    const newErrorMessage = {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    };
-
-    // Basic email validation regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!name) {
-      newErrors.name = true;
-      newErrorMessage.name = "Name is required!";
-      hasError = true;
-    }
-    if (!email) {
-      newErrors.email = true;
-      newErrorMessage.email = "Email is required!";
-      hasError = true;
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = true;
-      newErrorMessage.email = "Please enter a valid email!";
-      hasError = true;
-    }
-
-    if (!password) {
-      newErrors.password = true;
-      newErrorMessage.password = "Password is required!";
-      hasError = true;
-    } else if (password.length < 8) {
-      newErrors.password = true;
-      newErrorMessage.password = "Password must be at least 8 characters long!";
-      hasError = true;
-    }
-
-    if (!confirmPassword) {
-      newErrors.confirmPassword = true;
-      newErrorMessage.confirmPassword = "Confirm Password is required!";
-      hasError = true;
-    }
-    if (password && confirmPassword && password !== confirmPassword) {
-      newErrors.confirmPassword = true;
-      newErrorMessage.confirmPassword = "Password and Confirm Password are different!";
-      hasError = true;
-    }
-
-    if (hasError) {
-      setErrors(newErrors);
-      setErrorMessage(newErrorMessage);
-      return;
-    }
-    setIsLogin(true);
-    // Proceed with sign-up logic...
+  const onSignUp = () => {
+    handleSignUp({
+      name,
+      email,
+      password,
+      confirmPassword,
+      setErrors,
+      setErrorMessage,
+      setIsLogin,
+    });
   };
 
-  const handleLogin = () => {
-    let hasError = false;
-    const newErrors = {
-      name: false,
-      email: false,
-      password: false,
-      confirmPassword: false,
-    };
-
-    const newErrorMessage = {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    };
-
-    // Basic email validation regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!email) {
-      newErrors.email = true;
-      newErrorMessage.email = "Email is required!";
-      hasError = true;
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = true;
-      newErrorMessage.email = "Please enter a valid email!";
-      hasError = true;
-    }
-
-    if (!password) {
-      newErrors.password = true;
-      newErrorMessage.password = "Password is required!";
-      hasError = true;
-    } else if (password.length < 8) {
-      newErrors.password = true;
-      newErrorMessage.password = "Password must be at least 8 characters long!";
-      hasError = true;
-    }
-
-    if (hasError) {
-      setErrors(newErrors);
-      setErrorMessage(newErrorMessage);
-      return;
-    }
-
-    // Proceed with login logic...
+  const onLogin = () => {
+    handleLogin({
+      email,
+      password,
+      setErrors,
+      setErrorMessage,
+    });
   };
 
   return (
@@ -165,8 +77,8 @@ const LoginSignup = () => {
         >
           <DarkMode>
             {!isLogin ? (
-              <Flex direction="column" align="center" gap={4}>
-                <Fieldset.Root size="lg" maxW="md" w="70%">
+              <Flex direction="column" align="center" gap={4} width="2/5">
+                <Fieldset.Root size="lg" maxW="md">
                   <Stack>
                     <Fieldset.Legend>Create an Account</Fieldset.Legend>
                     <Fieldset.HelperText>Please provide your details below.</Fieldset.HelperText>
@@ -176,8 +88,9 @@ const LoginSignup = () => {
                       <Field.Label>Name</Field.Label>
                       <Input
                         placeholder="John Doe"
-                        variant="subtle"
-                        bgColor="blue.800"
+                        variant="flushed"
+                        borderColor="blue.800"
+                        _focus={{ borderColor: "blue.400" }}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                       />
@@ -187,7 +100,9 @@ const LoginSignup = () => {
                       <Field.Label>Email</Field.Label>
                       <Input
                         placeholder="johndoe@example.com"
-                        variant="outline"
+                        variant="flushed"
+                        borderColor="blue.800"
+                        _focus={{ borderColor: "blue.400" }}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
@@ -197,21 +112,24 @@ const LoginSignup = () => {
                       <Field.Label>Password</Field.Label>
                       <PasswordInput
                         placeholder="**********"
-                        variant="outline"
+                        variant="flushed"
+                        borderColor="blue.800"
+                        _focus={{ borderColor: "blue.400" }}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
-                      <Field.HelperText>
-                        Your password must be at least 8 characters long and should include a mix
-                        of letters, numbers, and symbols.
-                      </Field.HelperText>
-                      {errors.password && <Field.ErrorText>{errorMessage.password}</Field.ErrorText>}
+                      <PasswordStrengthMeter password={password} />
+                      {errors.password && (
+                        <Field.ErrorText>{errorMessage.password}</Field.ErrorText>
+                      )}
                     </Field.Root>
                     <Field.Root invalid={errors.confirmPassword}>
                       <Field.Label>Confirm Password</Field.Label>
                       <PasswordInput
                         placeholder="**********"
-                        variant="outline"
+                        variant="flushed"
+                        borderColor="blue.800"
+                        _focus={{ borderColor: "blue.400" }}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                       />
@@ -220,7 +138,7 @@ const LoginSignup = () => {
                       )}
                     </Field.Root>
                   </Fieldset.Content>
-                  <Button bgColor="blue.200" onClick={handleSignUp}>
+                  <Button bgColor="blue.200" onClick={onSignUp}>
                     Sign Up
                   </Button>
                 </Fieldset.Root>
@@ -248,18 +166,22 @@ const LoginSignup = () => {
         >
           <LightMode>
             {isLogin ? (
-              <Flex direction="column" align="center" gap={4}>
+              <Flex direction="column" align="center" gap={4} width="2/5">
                 <Fieldset.Root size="lg" maxW="md">
                   <Stack>
                     <Fieldset.Legend>Welcome Back</Fieldset.Legend>
-                    <Fieldset.HelperText>Please enter your Email ID and Password.</Fieldset.HelperText>
+                    <Fieldset.HelperText>
+                      Please enter your Email ID and Password.
+                    </Fieldset.HelperText>
                   </Stack>
                   <Fieldset.Content>
                     <Field.Root invalid={errors.email}>
                       <Field.Label>Email</Field.Label>
                       <Input
                         placeholder="johndoe@example.com"
-                        variant="outline"
+                        variant="flushed"
+                        borderColor="blue.200"
+                        _focus={{ borderColor: "blue.800" }}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
@@ -269,14 +191,18 @@ const LoginSignup = () => {
                       <Field.Label>Password</Field.Label>
                       <PasswordInput
                         placeholder="**********"
-                        variant="outline"
+                        variant="flushed"
+                        borderColor="blue.200"
+                        _focus={{ borderColor: "blue.800" }}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
-                      {errors.password && <Field.ErrorText>{errorMessage.password}</Field.ErrorText>}
+                      {errors.password && (
+                        <Field.ErrorText>{errorMessage.password}</Field.ErrorText>
+                      )}
                     </Field.Root>
                   </Fieldset.Content>
-                  <Button bgColor="blue.800" onClick={handleLogin}>
+                  <Button bgColor="blue.800" onClick={onLogin}>
                     Login
                   </Button>
                 </Fieldset.Root>
