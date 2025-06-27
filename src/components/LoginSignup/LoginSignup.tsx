@@ -3,8 +3,8 @@ import { Flex, Box, Input, Button, Text, Fieldset, Field, Stack } from "@chakra-
 import { PasswordInput } from "@/components/ui/password-input";
 import { PasswordStrengthMeter } from "@/components/LoginSignup/password-strength-meter";
 import { DarkMode, LightMode } from "@/components/ui/color-mode";
-import { handleSignUp } from "./handleSignUp";
-import { handleLogin } from "./handleLogin";
+import { handleSignUp } from "@/components/LoginSignup/handleSignUp";
+import { handleLogin } from "@/components/LoginSignup/handleLogin";
 
 const LoginSignup = () => {
   const [isLogin, setIsLogin] = useState(false);
